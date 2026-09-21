@@ -77,12 +77,15 @@ jobs:
         working-directory: portal
         run: |
           set -euo pipefail
-          if git diff --quiet -- "${SKILLS_DEST}"; then
+          # Stage so *new* files count too — `git diff` alone ignores untracked paths
+          # (portal main may not have public/.well-known/skills/ yet).
+          git add -- "${SKILLS_DEST}"
+          if git diff --cached --quiet -- "${SKILLS_DEST}"; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
             echo 'Portal skills already match this repo.' >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'changed=true' >> "$GITHUB_OUTPUT"
-            git diff --stat -- "${SKILLS_DEST}"
+            git diff --cached --stat -- "${SKILLS_DEST}"
           fi
 
       - name: Close a superseded sync pull request
