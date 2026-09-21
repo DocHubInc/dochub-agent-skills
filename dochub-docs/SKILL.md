@@ -22,9 +22,9 @@ Append `.md` to any docs page URL, and `.yaml` to any API reference URL:
 
 | Page | Fetch |
 |------|--------|
-| `/docs/webhooks/events` | https://dev.dochub.com/docs/webhooks/events.md |
-| `/api-reference/tag/entities` | https://dev.dochub.com/api-reference/tag/entities.yaml |
-| `/api-reference` | https://dev.dochub.com/api-reference/openapi.yaml |
+| https://dev.dochub.com/docs/webhooks/events | https://dev.dochub.com/docs/webhooks/events.md |
+| https://dev.dochub.com/api-reference/tag/entities | https://dev.dochub.com/api-reference/tag/entities.yaml |
+| https://dev.dochub.com/api-reference | https://dev.dochub.com/api-reference/openapi.yaml |
 
 Each tag YAML is a standalone OpenAPI document (that tag’s paths plus the schemas they reference). Prefer a tag slice over the complete spec. Fetch the complete spec only when the work spans many tags or you cannot tell which tag applies.
 
