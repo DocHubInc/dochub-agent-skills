@@ -3,6 +3,11 @@ name: 'Sync: Developer portal skills'
 # Copies this repo's skills into DocHubInc/dochub-developer-portal at
 # public/.well-known/skills/ and opens a pull request. This repo is the
 # source of truth — edit skills here, not in the portal.
+#
+# Commits through GitHub's API (ghcommit-action) with the OpenAPI Sync App
+# token so the author is dochub-openapi-sync[bot]. That matches OpenAPI sync
+# and lets auto-merge clear the portal's required-review / unattributed-commit
+# rules once checks are green.
 
 on:
   push:
@@ -107,43 +112,53 @@ jobs:
             || echo '::warning::Closed the pull request but could not leave a comment on it.'
           echo "Closed superseded pull request #$pr." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Push sync branch
-        id: push
+      - name: Compose commit message
+        id: message
         if: steps.diff.outputs.changed == 'true'
-        working-directory: portal
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          REPO: ${{ env.PORTAL_REPO }}
-          BRANCH: ${{ env.SYNC_BRANCH }}
           SOURCE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           short="${SOURCE_SHA:0:12}"
-          message="chore(skills): sync agent skills from dochub-agent-skills@${short}"
-          echo "title=$message" >> "$GITHUB_OUTPUT"
+          echo "text=chore(skills): sync agent skills from dochub-agent-skills@${short}" >> "$GITHUB_OUTPUT"
           echo "short=$short" >> "$GITHUB_OUTPUT"
 
-          git config user.name "dochub-agent-skills-sync[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+      # Point the sync branch at current main before committing so the PR is one
+      # commit on tip of main (same pattern as OpenAPI sync).
+      - name: Reset sync branch to main
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ env.PORTAL_REPO }}
+          BRANCH: ${{ env.SYNC_BRANCH }}
+        run: |
+          set -euo pipefail
+          main_sha="$(gh api "repos/$REPO/git/ref/heads/main" --jq '.object.sha')"
+          if gh api "repos/$REPO/git/ref/heads/$BRANCH" >/dev/null 2>&1; then
+            gh api -X PATCH "repos/$REPO/git/refs/heads/$BRANCH" -f "sha=$main_sha" -F force=true >/dev/null
+            echo "Reset $BRANCH to $main_sha"
+          else
+            gh api -X POST "repos/$REPO/git/refs" -f "ref=refs/heads/$BRANCH" -f "sha=$main_sha" >/dev/null
+            echo "Created $BRANCH at $main_sha"
+          fi
 
-          git fetch origin main
-          git checkout -B "$BRANCH" origin/main
-          # Re-apply sync onto the fresh main tip (working tree changes were on the
-          # earlier checkout; recreate dest from skills checkout).
-          dest="${SKILLS_DEST}"
-          rm -rf "$dest"
-          mkdir -p "$dest"
-          cp ../skills/index.json "$dest/index.json"
-          for dir in ../skills/dochub-*/; do
-            name="$(basename "$dir")"
-            mkdir -p "$dest/$name"
-            cp "$dir/SKILL.md" "$dest/$name/SKILL.md"
-          done
-
-          git add "$dest"
-          git commit -m "$message"
-          git push -u origin "$BRANCH" --force
+      # Commits via the App token so GitHub attributes the commit to
+      # dochub-openapi-sync[bot] (not github-actions[bot]). Required for the
+      # portal ruleset require_extra_approval_for_unattributed_changes.
+      #
+      # Pinned to a commit rather than the tag: this step receives a token that
+      # can write to the portal, and a tag can be repointed.
+      - name: Commit skills to sync branch
+        if: steps.diff.outputs.changed == 'true'
+        uses: planetscale/ghcommit-action@a6b150b81dca5dd027baa898604418eec9e11465 # v0.2.22
+        with:
+          commit_message: ${{ steps.message.outputs.text }}
+          repo: ${{ env.PORTAL_REPO }}
+          branch: ${{ env.SYNC_BRANCH }}
+          repository: portal
+          file_pattern: ${{ env.SKILLS_DEST }}
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Open pull request and enable auto-merge
         if: steps.diff.outputs.changed == 'true'
@@ -151,8 +166,8 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           REPO: ${{ env.PORTAL_REPO }}
           BRANCH: ${{ env.SYNC_BRANCH }}
-          TITLE: ${{ steps.push.outputs.title }}
-          SHORT: ${{ steps.push.outputs.short }}
+          TITLE: ${{ steps.message.outputs.text }}
+          SHORT: ${{ steps.message.outputs.short }}
           SOURCE_REPO: ${{ github.repository }}
           SOURCE_SHA: ${{ github.sha }}
         run: |
@@ -168,8 +183,9 @@ jobs:
             '`npx skills add https://dev.dochub.com` matches'
             '`npx skills add DocHubInc/dochub-agent-skills`.'
             ''
-            'Auto-merge is enabled when the sync App can bypass required reviews'
-            '(same idea as OpenAPI sync). Otherwise merge after checks pass.'
+            'Auto-merge is enabled. After required checks pass the PR merges'
+            'automatically when the sync App can bypass required reviews'
+            '(same idea as OpenAPI sync).'
           )
           body="$(printf '%s\n' "${body_lines[@]}")"
 
@@ -182,11 +198,12 @@ jobs:
               exit 1
             fi
           else
-            echo "Reusing open pull request #$pr (branch was force-pushed)."
+            echo "Reusing open pull request #$pr (branch was reset and recommitted)."
           fi
 
           if ! gh pr merge "$pr" --repo "$REPO" --auto --squash --delete-branch; then
-            echo "::warning::Could not enable auto-merge on #$pr — merge manually after checks pass."
+            echo "::error::Could not enable auto-merge on #$pr; see the GraphQL error above."
+            exit 1
           fi
 
           pr_url="$(gh pr view "$pr" --repo "$REPO" --json url --jq '.url')"
