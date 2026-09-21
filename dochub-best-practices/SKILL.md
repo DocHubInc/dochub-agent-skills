@@ -1,0 +1,38 @@
+---
+name: dochub-best-practices
+description: >-
+  Guides Public API v2 integration decisions: which portal docs and OpenAPI to
+  read, when to use API key vs OAuth, sign requests, documents, and webhooks.
+  Use when building or reviewing any Public API integration.
+---
+
+# Public API best practices
+
+Help the user **build their own integration** against **Public API v2**. Prefer writing code in their project over one-off live API probes unless they ask to debug against a sandbox.
+
+## Source of truth
+
+Do not invent paths, params, or auth details. Read:
+
+1. Domain skills when the task is specific: `dochub-auth`, `dochub-documents`, `dochub-sign-requests`, `dochub-webhooks`, or `dochub-docs`
+2. Portal documentation (`.md` URLs in those skills)
+3. Catalog: https://dev.dochub.com/llms.txt — then the matching tag YAML
+4. Complete spec only if the work spans many tags: https://dev.dochub.com/api-reference/openapi.yaml
+
+Do not fetch Scalar HTML for operation detail — every endpoint URL returns the same prerendered snapshot.
+
+## Routing (what to open next)
+
+| Building… | Open first |
+|-----------|------------|
+| Auth choice / tokens / scopes | `dochub-auth` → portal auth docs |
+| List/manage files, roles, PDF URL | `dochub-documents` → Documents / Document Roles YAML |
+| Send / resend / void sign requests | `dochub-sign-requests` → Sign Requests YAML |
+| Status-driven automation | `dochub-webhooks` → webhook docs + Webhooks YAML |
+| Unsure where something lives | `dochub-docs` → `llms.txt` |
+
+## Agent rules
+
+- Prefer the user’s language and their existing env/config patterns (do not invent product-specific env var names).
+- Redact secrets in replies. Do not commit credentials.
+- After scaffolding, point them at the portal docs/OpenAPI URLs you used.
