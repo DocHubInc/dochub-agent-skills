@@ -48,14 +48,3 @@ On every push to `main` that touches skills (or via **Actions → Sync: Develope
 1. Copies this repo’s skills into `DocHubInc/dochub-developer-portal` → `public/.well-known/skills/`
 2. Opens a PR on the portal (`chore/agent-skills-sync`)
 3. Tries to enable auto-merge (optional; needs the sync App on the portal’s bypass list)
-
-### One-time setup (org admin)
-
-1. Create a GitHub App (or reuse the OpenAPI sync App if it can be installed on both repos) with access to **`dochub-developer-portal`**:
-   - Repository permissions: **Contents: Read and write**, **Pull requests: Read and write**
-2. Install the App on `DocHubInc/dochub-developer-portal`
-3. In **this** repo (`dochub-agent-skills`) → Settings → Secrets and variables → Actions, add:
-   - `SKILLS_PORTAL_SYNC_APP_ID` — App ID
-   - `SKILLS_PORTAL_SYNC_APP_PRIVATE_KEY` — App private key (PEM)
-4. On the portal repo: allow the App to open PRs; for unattended merge, add it to the branch-protection bypass list (same as OpenAPI sync) and ensure auto-merge is enabled in repo settings
-5. Run the workflow once manually to verify a sync PR opens
