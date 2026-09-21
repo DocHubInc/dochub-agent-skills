@@ -1,0 +1,193 @@
+name: 'Sync: Developer portal skills'
+
+# Copies this repo's skills into DocHubInc/dochub-developer-portal at
+# public/.well-known/skills/ and opens a pull request. This repo is the
+# source of truth — edit skills here, not in the portal.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dochub-*/**'
+      - 'index.json'
+      - '.github/workflows/sync-developer-portal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-developer-portal-skills
+  cancel-in-progress: true
+
+env:
+  PORTAL_REPO: DocHubInc/dochub-developer-portal
+  SYNC_BRANCH: chore/agent-skills-sync
+  SKILLS_DEST: public/.well-known/skills
+
+jobs:
+  sync:
+    name: Sync skills via portal pull request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout skills (source of truth)
+        uses: actions/checkout@v4
+        with:
+          path: skills
+          persist-credentials: false
+
+      - name: Mint App token for developer portal
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.SKILLS_PORTAL_SYNC_APP_ID }}
+          private-key: ${{ secrets.SKILLS_PORTAL_SYNC_APP_PRIVATE_KEY }}
+          owner: DocHubInc
+          repositories: dochub-developer-portal
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Checkout developer portal
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PORTAL_REPO }}
+          ref: main
+          path: portal
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: false
+
+      - name: Replace portal skill pack
+        run: |
+          set -euo pipefail
+          dest="portal/${SKILLS_DEST}"
+          rm -rf "$dest"
+          mkdir -p "$dest"
+          cp skills/index.json "$dest/index.json"
+          for dir in skills/dochub-*/; do
+            name="$(basename "$dir")"
+            mkdir -p "$dest/$name"
+            cp "$dir/SKILL.md" "$dest/$name/SKILL.md"
+          done
+          echo "Synced into $dest:"
+          find "$dest" -type f | sort
+
+      - name: Detect changes
+        id: diff
+        working-directory: portal
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- "${SKILLS_DEST}"; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'Portal skills already match this repo.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+            git diff --stat -- "${SKILLS_DEST}"
+          fi
+
+      - name: Close a superseded sync pull request
+        if: steps.diff.outputs.changed == 'false'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ env.PORTAL_REPO }}
+          BRANCH: ${{ env.SYNC_BRANCH }}
+        run: |
+          set -euo pipefail
+          pr="$(gh pr list --repo "$REPO" --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$pr" ]; then
+            echo 'No open sync pull request to close.'
+            exit 0
+          fi
+          gh pr close "$pr" --repo "$REPO" --delete-branch
+          gh pr comment "$pr" --repo "$REPO" \
+            --body 'Superseded: `public/.well-known/skills` on `main` already matches DocHubInc/dochub-agent-skills.' \
+            || echo '::warning::Closed the pull request but could not leave a comment on it.'
+          echo "Closed superseded pull request #$pr." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Push sync branch
+        id: push
+        if: steps.diff.outputs.changed == 'true'
+        working-directory: portal
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ env.PORTAL_REPO }}
+          BRANCH: ${{ env.SYNC_BRANCH }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          short="${SOURCE_SHA:0:12}"
+          message="chore(skills): sync agent skills from dochub-agent-skills@${short}"
+          echo "title=$message" >> "$GITHUB_OUTPUT"
+          echo "short=$short" >> "$GITHUB_OUTPUT"
+
+          git config user.name "dochub-agent-skills-sync[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+
+          git fetch origin main
+          git checkout -B "$BRANCH" origin/main
+          # Re-apply sync onto the fresh main tip (working tree changes were on the
+          # earlier checkout; recreate dest from skills checkout).
+          dest="${SKILLS_DEST}"
+          rm -rf "$dest"
+          mkdir -p "$dest"
+          cp ../skills/index.json "$dest/index.json"
+          for dir in ../skills/dochub-*/; do
+            name="$(basename "$dir")"
+            mkdir -p "$dest/$name"
+            cp "$dir/SKILL.md" "$dest/$name/SKILL.md"
+          done
+
+          git add "$dest"
+          git commit -m "$message"
+          git push -u origin "$BRANCH" --force
+
+      - name: Open pull request and enable auto-merge
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ env.PORTAL_REPO }}
+          BRANCH: ${{ env.SYNC_BRANCH }}
+          TITLE: ${{ steps.push.outputs.title }}
+          SHORT: ${{ steps.push.outputs.short }}
+          SOURCE_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          body_lines=(
+            'Automated by `.github/workflows/sync-developer-portal.yml` in'
+            "\`${SOURCE_REPO}\`."
+            ''
+            "Source: [\`${SOURCE_REPO}@${SHORT}\`](https://github.com/${SOURCE_REPO}/commit/${SOURCE_SHA})."
+            ''
+            'Replaces `public/.well-known/skills/` so'
+            '`npx skills add https://dev.dochub.com` matches'
+            '`npx skills add DocHubInc/dochub-agent-skills`.'
+            ''
+            'Auto-merge is enabled when the sync App can bypass required reviews'
+            '(same idea as OpenAPI sync). Otherwise merge after checks pass.'
+          )
+          body="$(printf '%s\n' "${body_lines[@]}")"
+
+          pr="$(gh pr list --repo "$REPO" --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$pr" ]; then
+            gh pr create --repo "$REPO" --base main --head "$BRANCH" --title "$TITLE" --body "$body"
+            pr="$(gh pr list --repo "$REPO" --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
+            if [ -z "$pr" ]; then
+              echo "::error::Created a pull request for $BRANCH but could not read its number back."
+              exit 1
+            fi
+          else
+            echo "Reusing open pull request #$pr (branch was force-pushed)."
+          fi
+
+          if ! gh pr merge "$pr" --repo "$REPO" --auto --squash --delete-branch; then
+            echo "::warning::Could not enable auto-merge on #$pr — merge manually after checks pass."
+          fi
+
+          pr_url="$(gh pr view "$pr" --repo "$REPO" --json url --jq '.url')"
+          {
+            echo "Opened $pr_url with synced \`public/.well-known/skills\`."
+            echo "Source: \`${SOURCE_REPO}@${SHORT}\`."
+          } >> "$GITHUB_STEP_SUMMARY"

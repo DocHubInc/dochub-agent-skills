@@ -1,0 +1,34 @@
+{
+  "skills": [
+    {
+      "name": "dochub-best-practices",
+      "description": "Guides Public API v2 integration decisions: which portal docs and OpenAPI to read, when to use API key vs OAuth, sign requests, documents, and webhooks. Use when building or reviewing any Public API integration.",
+      "files": ["SKILL.md"]
+    },
+    {
+      "name": "dochub-auth",
+      "description": "Use when implementing Public API authentication (API keys or OAuth 2.0). Points to portal auth docs and OpenAPI — do not invent flows from memory.",
+      "files": ["SKILL.md"]
+    },
+    {
+      "name": "dochub-sign-requests",
+      "description": "Use when building or debugging sign-request flows. Read the portal OpenAPI and API reference; do not restate request parameters from memory.",
+      "files": ["SKILL.md"]
+    },
+    {
+      "name": "dochub-documents",
+      "description": "Use when listing or managing documents and document roles, or fetching PDF URLs. Read the portal OpenAPI and API reference.",
+      "files": ["SKILL.md"]
+    },
+    {
+      "name": "dochub-webhooks",
+      "description": "Use when adding webhook receivers or managing webhook endpoints. Read portal webhook docs and OpenAPI.",
+      "files": ["SKILL.md"]
+    },
+    {
+      "name": "dochub-docs",
+      "description": "Use when looking up Public API documentation or OpenAPI. Fetch llms.txt, then the linked markdown docs and per-tag OpenAPI YAML — do not invent paths or fetch Scalar HTML for operation detail.",
+      "files": ["SKILL.md"]
+    }
+  ]
+}
