@@ -1,7 +1,7 @@
 ---
 name: dochub-auth
 description: >-
-  Use when implementing Public API authentication (API keys or OAuth 2.0).
+  Use when implementing DocHub Public API authentication (API keys or OAuth 2.0).
   Points to portal auth docs and OpenAPI — do not invent flows from memory.
 ---
 

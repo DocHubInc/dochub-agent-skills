@@ -1,14 +1,14 @@
 ---
 name: dochub-best-practices
 description: >-
-  Guides Public API v2 integration decisions: which portal docs and OpenAPI to
+  Guides DocHub Public API integration decisions: which portal docs and OpenAPI to
   read, when to use API key vs OAuth, sign requests, documents, and webhooks.
-  Use when building or reviewing any Public API integration.
+  Use when building or reviewing any DocHub Public API integration.
 ---
 
-# Public API best practices
+# DocHub Public API best practices
 
-Help the user **build their own integration** against **Public API v2**. Prefer writing code in their project over one-off live API probes unless they ask to debug against a sandbox.
+Help the user **build their own integration** against **DocHub Public API**. Prefer writing code in their project over one-off live API probes unless they ask to debug against a sandbox.
 
 ## Source of truth
 

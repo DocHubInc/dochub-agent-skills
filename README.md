@@ -1,6 +1,6 @@
 # DocHub skills
 
-Public agent skills for building integrations against **DocHub Public API v2** (Cursor, Claude Code,
+Public agent skills for building integrations against **DocHub Public API** (Cursor, Claude Code,
 Codex, and others).
 
 Skills do **not** restate auth flows or endpoint parameters. They point at the public developer
