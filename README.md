@@ -1,22 +1,24 @@
-# DocHub agent skills
+# DocHub AI
 
-Thin agent skills that help coding agents (Cursor, Claude Code, Codex, and others) build integrations against **DocHub Public API v2**.
+Public AI tooling for building integrations against **DocHub Public API v2** — starting with agent
+skills for Cursor, Claude Code, Codex, and others.
 
-Skills do **not** restate auth flows or endpoint parameters. They point at the public developer portal docs and OpenAPI:
+Skills do **not** restate auth flows or endpoint parameters. They point at the public developer
+portal docs and OpenAPI:
 
 - Docs: https://dev.dochub.com/docs/
 - Catalog: https://dev.dochub.com/llms.txt
 - OpenAPI: https://dev.dochub.com/api-reference/openapi.yaml
 
-This repository is the **source of truth** for DocHub Public API agent skills.
+This repository is the **source of truth** for DocHub’s public agent skills (and future AI packs).
 
-## Install
+## Install agent skills
 
 ```bash
-npx skills add DocHubInc/dochub-agent-skills
+npx skills add DocHubInc/dochub-ai
 ```
 
-Use Node.js 20+. Docs for integrators: https://dev.dochub.com/docs/ai-agents
+Use Node.js 20+. Integrator docs: https://dev.dochub.com/docs/ai-agents
 
 ## Skills
 
@@ -31,5 +33,5 @@ Use Node.js 20+. Docs for integrators: https://dev.dochub.com/docs/ai-agents
 
 ## After install
 
-Start a new agent chat, then ask to scaffold an integration (for example OAuth + send a sign request from a template). Keep credentials in your app’s own env or secret manager.
-
+Start a new agent chat, then ask to scaffold an integration (for example OAuth + send a sign request
+from a template). Keep credentials in your app’s own env or secret manager.
