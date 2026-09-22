@@ -1,0 +1,20 @@
+{
+  "name": "dochub-skills",
+  "interface": {
+    "displayName": "DocHub"
+  },
+  "plugins": [
+    {
+      "name": "dochub",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

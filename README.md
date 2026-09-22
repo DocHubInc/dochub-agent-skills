@@ -1,7 +1,8 @@
 # DocHub skills
 
-Public agent skills for building integrations against **DocHub Public API v2** (Cursor, Claude Code,
-Codex, and others).
+Public agent skills for building **DocHub Public API integrations** (Cursor, Claude Code,
+Codex, and others). The Cursor, Claude, and Codex plugins also ship the official remote MCP
+at `https://dochub.com/mcp` (OAuth — no API keys in this repo).
 
 Skills do **not** restate auth flows or endpoint parameters. They point at the public developer
 portal docs and OpenAPI:
@@ -14,11 +15,33 @@ This repository is the **source of truth** for DocHub’s public agent skills.
 
 ## Install
 
+Any agent (Cursor, Claude Code, Codex, and others):
+
 ```bash
 npx skills add DocHubInc/dochub-skills
 ```
 
 Use Node.js 20+. Integrator docs: https://dev.dochub.com/docs/ai-agents
+
+### Cursor
+
+```text
+/add-plugin DocHubInc/dochub-skills
+```
+
+### Claude Code
+
+```text
+/plugin marketplace add DocHubInc/dochub-skills
+/plugin install dochub@dochub-skills
+```
+
+### Codex
+
+```text
+codex plugin marketplace add DocHubInc/dochub-skills
+codex plugin add dochub@dochub-skills
+```
 
 ## Skills
 
@@ -35,6 +58,10 @@ Use Node.js 20+. Integrator docs: https://dev.dochub.com/docs/ai-agents
 
 Start a new agent chat, then ask to scaffold an integration (for example OAuth + send a sign request
 from a template). Keep credentials in your app’s own env or secret manager.
+
+If you installed the Cursor, Claude, or Codex plugin, connect the **dochub** MCP and sign in to
+DocHub when prompted. Use MCP to act in your DocHub account; use the skills when you are writing an
+integration.
 
 ## License
 

@@ -1,0 +1,34 @@
+{
+  "name": "dochub",
+  "description": "Agent skills for DocHub Public API integrations, plus the official remote MCP for documents and e-sign.",
+  "version": "1.0.0",
+  "author": {
+    "name": "DocHub",
+    "email": "support@dochub.com",
+    "url": "https://www.dochub.com"
+  },
+  "homepage": "https://dev.dochub.com/docs/ai-agents",
+  "repository": "https://github.com/DocHubInc/dochub-skills",
+  "license": "MIT",
+  "keywords": ["dochub", "e-signature", "documents", "webhooks", "oauth"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "DocHub",
+    "shortDescription": "DocHub API integrations",
+    "longDescription": "Agent skills for building DocHub Public API integrations, plus the official remote MCP for documents and e-sign.",
+    "developerName": "DocHub",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://www.dochub.com",
+    "privacyPolicyURL": "https://legal.dochub.com/privacy-notice",
+    "termsOfServiceURL": "https://legal.dochub.com/terms",
+    "supportURL": "https://www.dochub.com",
+    "defaultPrompt": [
+      "Add OAuth and send a sign request from a template.",
+      "Create a webhook receiver for sign-request status.",
+      "Set up API key auth and list documents."
+    ],
+    "logo": "./assets/logo.png"
+  }
+}

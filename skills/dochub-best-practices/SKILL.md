@@ -1,14 +1,16 @@
 ---
 name: dochub-best-practices
 description: >-
-  Guides Public API v2 integration decisions: which portal docs and OpenAPI to
-  read, when to use API key vs OAuth, sign requests, documents, and webhooks.
-  Use when building or reviewing any Public API integration.
+  Guides DocHub Public API integration decisions: which portal docs and OpenAPI
+  to read, when to use API key vs OAuth, sign requests, documents, and webhooks.
+  Use when building or reviewing any DocHub Public API integration.
 ---
 
 # Public API best practices
 
-Help the user **build their own integration** against **Public API v2**. Prefer writing code in their project over one-off live API probes unless they ask to debug against a sandbox.
+Help the user **build their own integration** against the **DocHub Public API**. Prefer writing code in their project over one-off live API probes unless they ask to debug against a sandbox.
+
+If they want to act in a **connected DocHub account** (list documents, fill fields, prepare or send a sign request), use the DocHub MCP tools from `https://dochub.com/mcp` instead of scaffolding an integration. Do not use MCP as a substitute for writing the user’s app.
 
 ## Source of truth
 

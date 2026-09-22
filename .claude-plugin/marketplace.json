@@ -1,0 +1,25 @@
+{
+  "name": "dochub-skills",
+  "owner": {
+    "name": "DocHub",
+    "email": "support@dochub.com",
+    "url": "https://www.dochub.com"
+  },
+  "description": "Public agent skills and official MCP for DocHub Public API integrations",
+  "plugins": [
+    {
+      "name": "dochub",
+      "source": "./",
+      "description": "Agent skills for DocHub Public API integrations, plus the official remote MCP for documents and e-sign.",
+      "version": "1.0.0",
+      "author": {
+        "name": "DocHub",
+        "email": "support@dochub.com"
+      },
+      "homepage": "https://dev.dochub.com/docs/ai-agents",
+      "repository": "https://github.com/DocHubInc/dochub-skills",
+      "license": "MIT",
+      "keywords": ["dochub", "e-signature", "documents", "webhooks", "oauth"]
+    }
+  ]
+}
