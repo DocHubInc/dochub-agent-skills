@@ -6,7 +6,7 @@ description: >-
   Use when building or reviewing any DocHub Public API integration.
 ---
 
-# Public API best practices
+# DocHub Public API best practices
 
 Help the user **build their own integration** against the **DocHub Public API**. Prefer writing code in their project over one-off live API probes unless they ask to debug against a sandbox.
 

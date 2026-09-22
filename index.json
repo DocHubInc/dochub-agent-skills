@@ -7,7 +7,7 @@
     },
     {
       "name": "dochub-auth",
-      "description": "Use when implementing Public API authentication (API keys or OAuth 2.0). Points to portal auth docs and OpenAPI — do not invent flows from memory.",
+      "description": "Use when implementing DocHub Public API authentication (API keys or OAuth 2.0). Points to portal auth docs and OpenAPI — do not invent flows from memory.",
       "files": ["SKILL.md"]
     },
     {
@@ -27,7 +27,7 @@
     },
     {
       "name": "dochub-docs",
-      "description": "Use when looking up Public API documentation or OpenAPI. Fetch llms.txt, then the linked markdown docs and per-tag OpenAPI YAML — do not invent paths or fetch Scalar HTML for operation detail.",
+      "description": "Use when looking up DocHub Public API documentation or OpenAPI. Fetch llms.txt, then the linked markdown docs and per-tag OpenAPI YAML — do not invent paths or fetch Scalar HTML for operation detail.",
       "files": ["SKILL.md"]
     }
   ]

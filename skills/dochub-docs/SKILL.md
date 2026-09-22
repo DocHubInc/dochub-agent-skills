@@ -1,7 +1,7 @@
 ---
 name: dochub-docs
 description: >-
-  Use when looking up Public API documentation or OpenAPI. Fetch llms.txt, then
+  Use when looking up DocHub Public API documentation or OpenAPI. Fetch llms.txt, then
   the linked markdown docs and per-tag OpenAPI YAML — do not invent paths or
   fetch Scalar HTML for operation detail.
 ---
