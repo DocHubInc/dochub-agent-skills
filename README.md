@@ -1,7 +1,7 @@
-# DocHub AI toolkits
+# DocHub skills
 
-Public AI tooling for building integrations against **DocHub Public API v2** — starting with agent
-skills for Cursor, Claude Code, Codex, and others.
+Public agent skills for building integrations against **DocHub Public API v2** (Cursor, Claude Code,
+Codex, and others).
 
 Skills do **not** restate auth flows or endpoint parameters. They point at the public developer
 portal docs and OpenAPI:
@@ -10,12 +10,12 @@ portal docs and OpenAPI:
 - Catalog: https://dev.dochub.com/llms.txt
 - OpenAPI: https://dev.dochub.com/api-reference/openapi.yaml
 
-This repository is the **source of truth** for DocHub’s public agent skills (and future AI packs).
+This repository is the **source of truth** for DocHub’s public agent skills.
 
-## Install agent skills
+## Install
 
 ```bash
-npx skills add DocHubInc/dochub-ai-toolkits
+npx skills add DocHubInc/dochub-skills
 ```
 
 Use Node.js 20+. Integrator docs: https://dev.dochub.com/docs/ai-agents
