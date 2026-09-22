@@ -35,3 +35,7 @@ Use Node.js 20+. Integrator docs: https://dev.dochub.com/docs/ai-agents
 
 Start a new agent chat, then ask to scaffold an integration (for example OAuth + send a sign request
 from a template). Keep credentials in your app’s own env or secret manager.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
