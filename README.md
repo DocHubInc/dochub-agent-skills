@@ -23,26 +23,6 @@ npx skills add DocHubInc/dochub-skills
 
 Use Node.js 20+. Integrator docs: https://dev.dochub.com/docs/ai-agents
 
-### Cursor
-
-```text
-/add-plugin DocHubInc/dochub-skills
-```
-
-### Claude Code
-
-```text
-/plugin marketplace add DocHubInc/dochub-skills
-/plugin install dochub@dochub-skills
-```
-
-### Codex
-
-```text
-codex plugin marketplace add DocHubInc/dochub-skills
-codex plugin add dochub@dochub-skills
-```
-
 ## Skills
 
 | Skill | Use when |
